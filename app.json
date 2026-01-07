@@ -2,7 +2,7 @@
   "expo": {
     "name": "g1-practice-app",
     "slug": "snack-cc61a309-156d-4dde-9118-92d038d8487a",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
