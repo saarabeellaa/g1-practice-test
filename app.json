@@ -1,29 +1,13 @@
 {
   "expo": {
-    "name": "g1-practice-app",
-    "slug": "snack-cc61a309-156d-4dde-9118-92d038d8487a",
-    "version": "1.0.1",
+    "name": "G1 Practice Test",
+    "slug": "g1-practice-test",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "ios": {
-      "supportsTablet": true
-    },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
+      "package": "com.saramouloudi.g1practice",
+      "versionCode": 1
     }
   }
 }
