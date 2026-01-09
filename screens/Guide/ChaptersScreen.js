@@ -3,9 +3,11 @@ import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'rea
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '../../styles/styles.js';
 import { useTopics } from '../../hooks/useData.js';
-import { supabase, TEST_USER_ID } from '../../supabase.js';
+import { supabase } from '../../supabase.js';
+import { useUserId } from '../../context/UserContext';
 
 export function ChaptersScreen({ navigation }) {
+  const { userId, loading: userLoading } = useUserId();
   const [topics, loading] = useTopics();
   const [chapterData, setChapterData] = React.useState({});
   const [loadingData, setLoadingData] = React.useState(true);
@@ -22,22 +24,27 @@ export function ChaptersScreen({ navigation }) {
     8: 'account-group',
   };
 
-  // Card background colors - matching Signs screen palette
+  // Card background colors
   const cardColors = [
-    '#fff', // Light blue
-    '#fff', // Light orange
-    '#fff', // Light purple
-    '#fff', // Light green
+    '#fff',
+    '#fff',
+    '#fff',
+    '#fff',
   ];
 
   React.useEffect(() => {
     let mounted = true;
     
     async function loadChapterData() {
-      if (!supabase || topics.length === 0) {
+      // Wait for userId to be ready
+      if (!supabase || !userId || topics.length === 0) {
+        console.log('⏳ Waiting for data... userId:', userId, 'topics:', topics.length);
         if (mounted) setLoadingData(false);
         return;
       }
+
+      console.log('📊 Loading chapter data with userId:', userId);
+      setLoadingData(true);
 
       try {
         const dataMap = {};
@@ -54,9 +61,11 @@ export function ChaptersScreen({ navigation }) {
             const { data: progressData } = await supabase
               .from('chapter_progress')
               .select('*')
-              .eq('user_id', TEST_USER_ID)
+              .eq('user_id', userId)
               .eq('topic_id', topic.id)
               .maybeSingle();
+            
+            console.log(`📖 Topic ${topic.id} progress:`, progressData);
             
             dataMap[topic.id] = {
               totalLessons,
@@ -67,6 +76,7 @@ export function ChaptersScreen({ navigation }) {
               estimatedMinutes: totalLessons * 8
             };
           } catch (err) {
+            console.error('Error fetching progress for topic', topic.id, err);
             dataMap[topic.id] = {
               totalLessons,
               completedLessons: 0,
@@ -81,6 +91,7 @@ export function ChaptersScreen({ navigation }) {
         if (mounted) {
           setChapterData(dataMap);
           setLoadingData(false);
+          console.log('✅ Chapter data loaded:', dataMap);
         }
       } catch (error) {
         console.error('Error loading chapter data:', error);
@@ -90,7 +101,7 @@ export function ChaptersScreen({ navigation }) {
 
     loadChapterData();
     return () => { mounted = false; };
-  }, [topics]);
+  }, [topics, userId]); // Re-run when userId arrives
 
   const formatLastAccessed = (timestamp) => {
     if (!timestamp) return null;
@@ -108,7 +119,7 @@ export function ChaptersScreen({ navigation }) {
     return date.toLocaleDateString();
   };
 
-  if (loading || loadingData) {
+  if (loading || loadingData || userLoading) {
     return <ActivityIndicator size="large" color="#1976d2" style={{ marginTop: 80 }} />;
   }
 
@@ -161,8 +172,6 @@ export function ChaptersScreen({ navigation }) {
 
                   <Text style={styles.enhancedChapterTitle}>{topic.title}</Text>
                 </View>
-
-                
 
                 <View style={styles.enhancedMetaRow}>
                   <View style={styles.enhancedMetaItem}>
