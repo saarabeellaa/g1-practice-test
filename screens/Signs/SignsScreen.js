@@ -3,9 +3,11 @@ import { View, Text, ScrollView, TouchableOpacity, Image, ActivityIndicator } fr
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '../../styles/styles.js';
 import { useCategories } from '../../hooks/useData.js';
-import { supabase, TEST_USER_ID } from '../../supabase.js';
+import { supabase } from '../../supabase.js';
+import { useUserId } from '../../context/UserContext';
 
 export function SignsScreen({ navigation }) {
+  const { userId, loading: userLoading } = useUserId();
   const [categories, loadingCategories] = useCategories();
   const [progress, setProgress] = React.useState({
     new: 0,
@@ -21,12 +23,15 @@ export function SignsScreen({ navigation }) {
   React.useEffect(() => {
     let mounted = true;
     async function loadProgress() {
-      if (!supabase) {
-        console.error("Supabase not initialized");
+      if (!supabase || !userId) {
+        console.log('⏳ Waiting for userId:', userId);
         if (mounted) setLoadingProgress(false);
         return;
       }
       
+      console.log('📊 Loading signs progress with userId:', userId);
+      setLoadingProgress(true);
+
       try {
         const { data: allSigns, error: signsError } = await supabase
           .from('signs')
@@ -37,9 +42,11 @@ export function SignsScreen({ navigation }) {
         const { data: userProgress, error: progressError } = await supabase
           .from('sign_progress')
           .select('sign_id, correct_count, incorrect_count, mastered')
-          .eq('user_id', TEST_USER_ID);
+          .eq('user_id', userId);
 
         if (progressError) throw progressError;
+
+        console.log('✅ Signs progress loaded:', userProgress?.length, 'records');
 
         if (!mounted) return;
 
@@ -98,7 +105,7 @@ export function SignsScreen({ navigation }) {
     }
     loadProgress();
     return () => { mounted = false; };
-  }, []);
+  }, [userId]);
 
   const filteredContent = React.useMemo(() => {
     if (activeTab === 'all') {
@@ -143,7 +150,7 @@ export function SignsScreen({ navigation }) {
     return { type: 'categories', data: [] };
   }, [categories, allSignsProgress, activeTab]);
 
-  if (loadingCategories || loadingProgress) {
+  if (loadingCategories || loadingProgress || userLoading) {
     return <ActivityIndicator size="large" color="#1976d2" style={{ marginTop: 80 }} />;
   }
 
