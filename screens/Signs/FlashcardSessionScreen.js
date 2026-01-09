@@ -2,9 +2,11 @@ import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '../../styles/styles';
-import { supabase, TEST_USER_ID } from '../../supabase';
+import { supabase } from '../../supabase.js';
+import { useUserId } from '../../context/UserContext';
 
 export function FlashcardSessionScreen({ route, navigation }) {
+  const { userId } = useUserId();
   const { cards, categoryId, isQuickPractice } = route.params || {};
   const [current, setCurrent] = React.useState(0);
   const [selectedAnswer, setSelectedAnswer] = React.useState(null);
@@ -68,7 +70,7 @@ export function FlashcardSessionScreen({ route, navigation }) {
       const { data: existing, error: fetchError } = await supabase
         .from('sign_progress')
         .select('*')
-        .eq('user_id', TEST_USER_ID)
+        .eq('user_id', userId)
         .eq('sign_id', signId)
         .single();
 
@@ -111,7 +113,7 @@ export function FlashcardSessionScreen({ route, navigation }) {
         const { error: insertError } = await supabase
           .from('sign_progress')
           .insert({
-            user_id: TEST_USER_ID,
+            user_id: userId,
             sign_id: signId,
             correct_count: answerCorrect ? 1 : 0,
             incorrect_count: answerCorrect ? 0 : 1,
