@@ -3,23 +3,30 @@ import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'rea
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '../../styles/styles.js';
 import { useLessons, useTopicQuiz } from '../../hooks/useData.js';
-import { supabase, TEST_USER_ID } from '../../supabase.js';
+import { supabase } from '../../supabase.js';
+import { useUserId } from '../../context/UserContext';
 
 export function LessonListScreen({ route, navigation }) {
+  const { userId, loading: userLoading } = useUserId();
   const { topicId, title } = route.params;
   const [lessons, loading] = useLessons(topicId);
   const [quiz, loadingQuiz] = useTopicQuiz(topicId);
 
-  // Update last accessed when screen loads (only if table exists)
+  // Update last accessed when screen loads
   React.useEffect(() => {
     async function updateLastAccessed() {
-      if (!supabase || !topicId) return;
+      if (!supabase || !topicId || !userId) {
+        console.log('⏳ Waiting for userId in LessonList:', userId);
+        return;
+      }
+
+      console.log('📝 Updating last accessed for topic:', topicId, 'userId:', userId);
 
       try {
         const { data: existing } = await supabase
           .from('chapter_progress')
           .select('*')
-          .eq('user_id', TEST_USER_ID)
+          .eq('user_id', userId)
           .eq('topic_id', topicId)
           .maybeSingle();
 
@@ -28,26 +35,27 @@ export function LessonListScreen({ route, navigation }) {
             .from('chapter_progress')
             .update({ last_accessed: new Date().toISOString() })
             .eq('id', existing.id);
+          console.log('✅ Updated last_accessed');
         } else {
           await supabase
             .from('chapter_progress')
             .insert({
-              user_id: TEST_USER_ID,
+              user_id: userId,
               topic_id: topicId,
               completed_lessons: 0,
               last_accessed: new Date().toISOString()
             });
+          console.log('✅ Created new chapter_progress record');
         }
       } catch (error) {
-        // Silently fail if table doesn't exist
-        console.log('Chapter progress tracking not available');
+        console.error('Error updating last accessed:', error);
       }
     }
 
     updateLastAccessed();
-  }, [topicId]);
+  }, [topicId, userId]);
 
-  if (loading || loadingQuiz) {
+  if (loading || loadingQuiz || userLoading) {
     return <ActivityIndicator size="large" color="#1976d2" style={{ marginTop: 80 }} />;
   }
   
