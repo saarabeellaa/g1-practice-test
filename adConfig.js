@@ -1,0 +1,2 @@
+export const ADMOB_APP_ID = 'ca-app-pub-3990448886293370~1905743418';
+export const ADMOB_BANNER_UNIT_ID = 'ca-app-pub-3990448886293370/4801361884';
