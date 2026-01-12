@@ -18,12 +18,16 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "plugins": [
+    "expo-google-mobile-ads"
+    ],
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "package": "com.saramouloudi.g1practice",
-      "versionCode": 1,
+      "versionCode": 3,
+      "googleMobileAdsAppId": "ca-app-pub-3990448886293370~1905743418"
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
