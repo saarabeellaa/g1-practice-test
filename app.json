@@ -18,9 +18,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "plugins": [
-    "expo-google-mobile-ads"
-    ],
+    
     "ios": {
       "supportsTablet": true
     },
