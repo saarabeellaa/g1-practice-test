@@ -1,4 +1,4 @@
-import { AdMobBanner } from 'expo-ads-admob';
+import { AdMobBanner } from 'expo-google-mobile-ads';
 
 <AdMobBanner
   bannerSize="smartBannerPortrait"
