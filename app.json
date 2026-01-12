@@ -28,7 +28,7 @@
     },
     "plugins": [
       [
-        "react-native-google-mobile-ads",
+        "@react-native-google-mobile-ads/expo-plugin",
         {
           "androidAppId": "ca-app-pub-3990448886293370~1905743418"
         }
