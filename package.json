@@ -8,6 +8,8 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "react-native-google-mobile-ads": "^13.0.0",
+    "@react-native-google-mobile-ads/expo-plugin": "^1.0.0",
     "expo": "~54.0.31",
     "@react-native-async-storage/async-storage": "~1.21.0",
     "expo-status-bar": "~3.0.9",
